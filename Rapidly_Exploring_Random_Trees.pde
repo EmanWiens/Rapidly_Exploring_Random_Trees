@@ -11,13 +11,14 @@ final float stepSize = 20;
 
 Node start, end; 
 boolean endReached; 
-ArrayList<Integer> path; 
+ArrayList<Node> path; 
 
 void setup() {
   size(500, 500); 
   generateStartAndEnd(); 
   endReached = false; 
-  path = new ArrayList<Integer>(); 
+  path = new ArrayList<Node>(); 
+  // frameRate(1); 
   
   // TODO generate obstactes 
 }
@@ -55,14 +56,13 @@ void draw() {
   // if the end is reached, draw the path of it 
   if (endReached) {
     stroke(0, 255, 0); 
-    current = start; 
-    Node prev = null; 
+    Node next; 
     
-    for (int i = 0; i < path.size() - 1; i++) {
-      prev = current; 
-      current = current.getNext(path.get(i)); 
+    for (int i = 0; i < path.size() - 1; i++) { 
+      current = path.get(i); 
+      next = path.get(i + 1); 
       
-      line(prev.getPos().x, prev.getPos().y, current.getPos().x, current.getPos().y); 
+      line(current.getPos().x, current.getPos().y, next.getPos().x, next.getPos().y); 
     }
   }
   
@@ -91,25 +91,33 @@ void step(PVector target) {
 } 
 
 // depth first search 
-void findPath() {
-  println("TODO find the path to the goal!"); 
-  //ArrayList<Node> queue = new ArrayList<Node>(); 
-  //queue.add(start); 
-  //Node current = start; 
-  //path.add(current.getNext().size() - 1); 
+void findPath() { 
+  Node current; 
+  path.add(start); 
+  boolean visitNext; 
   
-  //while(true) { 
-  //  current.getNext(path.get(path.size())); 
+  while(true) { 
+    current = path.get(path.size() - 1); 
+    visitNext = false; 
     
-  //  if (path.get(path.size() - 1) < 0 || current.getNext().size() - 1 < 0) { 
-  //    path.remove(path.size() - 1);
-  //  } else {
-  //    path.set(path.size() - 1, path.get(path.size() - 1) - 1); 
-  //  }
+    for (Node node : current.getNext()) {
+      if (!node.isVisited()) {
+        path.add(node); 
+        visitNext = true; 
+        break; 
+      } 
+    } 
     
-  //  if (current.isEnd()) 
-  //    break; 
-  //} 
+    if (!visitNext) { 
+      current.setVisited(); 
+      path.remove(path.size() - 1); 
+    } 
+    
+    if (current.isEnd()) { 
+      path.add(current); 
+      break; 
+    }
+  } 
 }
 
 Node closestNode(PVector target) {

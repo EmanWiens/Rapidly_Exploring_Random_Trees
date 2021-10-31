@@ -4,3 +4,4 @@ Implementation based on Rapidly-Exploring Random Trees: Progress and Prospects b
 Link: http://msl.cs.uiuc.edu/~lavalle/papers/LavKuf01.pdf
 Link: http://msl.cs.illinois.edu/~lavalle/papers/Lav98c.pdf 
 
+Recursive Depth First search (DFS): https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/
