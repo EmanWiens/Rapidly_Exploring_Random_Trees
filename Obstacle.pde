@@ -11,12 +11,36 @@ class Obstacle {
   } 
   
   void draw() { 
-    stroke(0); 
+    stroke(50, 50, 200); 
+    // fill(50, 50, 200); 
     noFill(); 
-    rect(pos.x, pos.y, w, h); 
+    // rect(pos.x, pos.y, w, h); 
+    
+    strokeWeight(1); 
+    line(pos.x, pos.y, pos.x + w, pos.y); 
+    line(pos.x, pos.y, pos.x, pos.y + h); 
+    line(pos.x, pos.y + h, pos.x + w, pos.y + h); 
+    line(pos.x + w, pos.y, pos.x + w, pos.y + h); 
+    strokeWeight(1); 
   } 
   
   public boolean inBounds(PVector point) { 
-    return point.x > pos.x && point.x < pos.x + w && point.y > pos.y && point.y < pos.y + h; 
+    return point.x > pos.x && point.x < pos.x + w && point.y > pos.y && point.y < pos.y + h;
+  }
+  
+  public boolean intersects(PVector current, PVector step) { 
+    // top line 
+    if (lineIntersect(current, step, pos, new PVector(pos.x + w, pos.y))) 
+      return true; 
+    // right line 
+    if (lineIntersect(current, step, pos, new PVector(pos.x, pos.y + h))) 
+      return true; 
+    // bottom line 
+    if (lineIntersect(current, step, new PVector(pos.x, pos.y + h), new PVector(pos.x + w, pos.y + h))) 
+      return true; 
+    // left line 
+    if (lineIntersect(current, step, new PVector(pos.x + w, pos.y), new PVector(pos.x + w, pos.y + h))) 
+      return true; 
+    return false;
   }
 }

@@ -1,15 +1,15 @@
 /* 
  * Created by Emanuel Wiens 
- * Created in Oct 27, 2021 
- * Purpose: Implementation based on Rapidly-Exploring Random Trees: Progress and Prospects by Steven M. LaValle and 
- *   James J. Kuffner and Rapidly-Exploring Random Trees A New Tool for Path Planning by Steven M. LaValle. 
+ * Created on Oct 27, 2021 
+ * Purpose: Implementation based on "Rapidly-Exploring Random Trees: Progress and Prospects" by Steven M. LaValle and James J. Kuffner and "Rapidly-Exploring Random Trees A New Tool for Path Planning" by Steven M. LaValle. 
  * Link: http://msl.cs.uiuc.edu/~lavalle/papers/LavKuf01.pdf
  * Link: http://msl.cs.illinois.edu/~lavalle/papers/Lav98c.pdf 
+ * Calculating intercept point of two vectors: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
  */ 
 
 final float stepSize = 25; 
-final int[] obstacleSizes = new int[]{ 32, 64, 256 }; 
-final int numObstacles = 25; 
+final int[] obstacleSizes = new int[]{ 8, 64, 128, 512 }; 
+final int numObstacles = 15; 
 
 Node start, end; 
 boolean endReached; 
@@ -30,14 +30,14 @@ void setup() {
 }
 
 void draw() {
-  background(255); 
+  background(255);   
   
   // if the goal is not reached, take a random step 
   if (!endReached) {
     PVector target = new PVector(random(width), random(height)); 
-    fill(0, 0, 255); 
-    noStroke(); 
-    ellipse(target.x, target.y, 5, 5);
+    //fill(0, 0, 255); 
+    //noStroke(); 
+    //ellipse(target.x, target.y, 5, 5); 
     step(target); 
   }
   
@@ -86,6 +86,22 @@ void draw() {
   ellipse(end.getPos().x, end.getPos().y, 5, 5);
 } 
 
+// p1 and p2 make up line 1
+boolean lineIntersect(PVector p1, PVector p2, PVector p3, PVector p4) { 
+  float denom = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x); 
+  // if (denom == 0) return false; 
+  
+  float px = ((p1.x * p2.y - p1.y * p2.x) * (p3.x - p4.x) - (p1.x - p2.x) * (p3.x * p4.y - p3.y * p4.x)) / denom; 
+  float py = ((p1.x * p2.y - p1.y * p2.x) * (p3.y - p4.y) - (p1.y- p2.y) * (p3.x * p4.y - p3.y * p4.x)) / denom; 
+  PVector p = new PVector(px, py); 
+  strokeWeight(10); 
+  point(px, py); 
+  strokeWeight(1); 
+  
+  // test if the point is on BOTH line segments 
+  return p1.dist(p) + p.dist(p2) == p1.dist(p2) && p3.dist(p) + p.dist(p4) == p3.dist(p4); 
+}
+
 void setupObstacles() { 
   PVector pos; 
   int w, h; 
@@ -98,6 +114,15 @@ void setupObstacles() {
     obstacles.add(new Obstacle(i, pos, w, h)); 
   } 
 } 
+
+Obstacle intersectsObstacle(PVector current, PVector step) {
+  for (Obstacle obstacle : obstacles) { 
+    if (obstacle.intersects(current, step)) 
+      return obstacle; 
+  } 
+  
+  return null; 
+}
 
 Obstacle inObstacle(PVector point) {
   for (Obstacle obstacle : obstacles) { 
@@ -115,7 +140,7 @@ void step(PVector target) {
   PVector normDir = target.sub(closest.getPos()).normalize(); 
   Node nextStep = new Node(new PVector(closest.getPos().x + normDir.x * stepSize, closest.getPos().y + normDir.y * stepSize)); 
   
-  if (inObstacle(nextStep.getPos()) == null) {
+  if (intersectsObstacle(closest.getPos(), nextStep.getPos()) == null && inObstacle(nextStep.getPos()) == null) {
     closest.addNext(nextStep); 
   
     if (nextStep.getPos().dist(end.getPos()) < stepSize) {
@@ -124,7 +149,7 @@ void step(PVector target) {
       
       findPath(); 
     }
-  }
+  } else println("NOT taking next step"); 
 } 
 
 // depth first search 
@@ -175,7 +200,7 @@ Node closestNode(PVector target) {
   }
   
   return closest; 
-}
+} 
 
 void generateStartAndEnd() { 
   // make sure that the end and start is not in an obstacle 
