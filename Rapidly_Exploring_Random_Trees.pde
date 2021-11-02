@@ -10,6 +10,7 @@
 final float stepSize = 25; 
 final int[] obstacleSizes = new int[]{ 8, 64, 128, 512 }; 
 final int numObstacles = 15; 
+final float epsilon = .1; 
 
 Node start, end; 
 boolean endReached; 
@@ -19,6 +20,7 @@ ArrayList<Obstacle> obstacles;
 void setup() {
   size(500, 500); 
   endReached = false; 
+  randomSeed(1);
   path = new ArrayList<Node>(); 
   // frameRate(1); 
   
@@ -89,17 +91,15 @@ void draw() {
 // p1 and p2 make up line 1
 boolean lineIntersect(PVector p1, PVector p2, PVector p3, PVector p4) { 
   float denom = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x); 
-  // if (denom == 0) return false; 
+  if (denom == 0) return false; 
   
   float px = ((p1.x * p2.y - p1.y * p2.x) * (p3.x - p4.x) - (p1.x - p2.x) * (p3.x * p4.y - p3.y * p4.x)) / denom; 
   float py = ((p1.x * p2.y - p1.y * p2.x) * (p3.y - p4.y) - (p1.y- p2.y) * (p3.x * p4.y - p3.y * p4.x)) / denom; 
   PVector p = new PVector(px, py); 
-  strokeWeight(10); 
-  point(px, py); 
-  strokeWeight(1); 
   
   // test if the point is on BOTH line segments 
-  return p1.dist(p) + p.dist(p2) == p1.dist(p2) && p3.dist(p) + p.dist(p4) == p3.dist(p4); 
+  return p1.dist(p) + p.dist(p2) > p1.dist(p2) - epsilon && p1.dist(p) + p.dist(p2) < p1.dist(p2) + epsilon && 
+    p3.dist(p) + p.dist(p4) > p3.dist(p4) - epsilon && p3.dist(p) + p.dist(p4) < p3.dist(p4) + epsilon; 
 }
 
 void setupObstacles() { 
@@ -140,7 +140,7 @@ void step(PVector target) {
   PVector normDir = target.sub(closest.getPos()).normalize(); 
   Node nextStep = new Node(new PVector(closest.getPos().x + normDir.x * stepSize, closest.getPos().y + normDir.y * stepSize)); 
   
-  if (intersectsObstacle(closest.getPos(), nextStep.getPos()) == null && inObstacle(nextStep.getPos()) == null) {
+  if (intersectsObstacle(closest.getPos(), nextStep.getPos()) == null) { // inObstacle(nextStep.getPos()) == null
     closest.addNext(nextStep); 
   
     if (nextStep.getPos().dist(end.getPos()) < stepSize) {
