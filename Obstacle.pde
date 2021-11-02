@@ -12,16 +12,8 @@ class Obstacle {
   
   void draw() { 
     stroke(50, 50, 200); 
-    // fill(50, 50, 200); 
-    noFill(); 
-    // rect(pos.x, pos.y, w, h); 
-    
-    strokeWeight(1); 
-    line(pos.x, pos.y, pos.x + w, pos.y); 
-    line(pos.x, pos.y, pos.x, pos.y + h); 
-    line(pos.x, pos.y + h, pos.x + w, pos.y + h); 
-    line(pos.x + w, pos.y, pos.x + w, pos.y + h); 
-    strokeWeight(1); 
+     fill(50, 50, 200); 
+     rect(pos.x, pos.y, w, h); 
   } 
   
   public boolean inBounds(PVector point) { 

@@ -20,9 +20,7 @@ ArrayList<Obstacle> obstacles;
 void setup() {
   size(500, 500); 
   endReached = false; 
-  randomSeed(1);
   path = new ArrayList<Node>(); 
-  // frameRate(1); 
   
   // Generate obstactes 
   obstacles = new ArrayList<Obstacle>(); 
@@ -37,9 +35,6 @@ void draw() {
   // if the goal is not reached, take a random step 
   if (!endReached) {
     PVector target = new PVector(random(width), random(height)); 
-    //fill(0, 0, 255); 
-    //noStroke(); 
-    //ellipse(target.x, target.y, 5, 5); 
     step(target); 
   }
   
@@ -140,7 +135,7 @@ void step(PVector target) {
   PVector normDir = target.sub(closest.getPos()).normalize(); 
   Node nextStep = new Node(new PVector(closest.getPos().x + normDir.x * stepSize, closest.getPos().y + normDir.y * stepSize)); 
   
-  if (intersectsObstacle(closest.getPos(), nextStep.getPos()) == null) { // inObstacle(nextStep.getPos()) == null
+  if (intersectsObstacle(closest.getPos(), nextStep.getPos()) == null) { 
     closest.addNext(nextStep); 
   
     if (nextStep.getPos().dist(end.getPos()) < stepSize) {
@@ -149,7 +144,7 @@ void step(PVector target) {
       
       findPath(); 
     }
-  } else println("NOT taking next step"); 
+  } 
 } 
 
 // depth first search 
