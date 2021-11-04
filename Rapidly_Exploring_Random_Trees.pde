@@ -21,6 +21,7 @@ void setup() {
   size(500, 500); 
   endReached = false; 
   path = new ArrayList<Node>(); 
+  randomSeed(17); // 6, 8
   
   // Generate obstactes 
   obstacles = new ArrayList<Obstacle>(); 
